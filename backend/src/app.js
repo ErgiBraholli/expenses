@@ -1,10 +1,10 @@
 import express from "express";
 import cors from "cors";
-import { auth } from "./middleware/auth.js";
 
 import categoryRoutes from "./routes/categoryRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import { requireAuth } from "./middleware/auth.js";
 
 const app = express();
 
@@ -16,10 +16,10 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(null, false);
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(null, false);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -34,8 +34,8 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.use("/api/categories", auth, categoryRoutes);
-app.use("/api/transactions", auth, transactionRoutes);
-app.use("/api/dashboard", auth, dashboardRoutes);
+app.use("/api/categories", requireAuth, categoryRoutes);
+app.use("/api/transactions", requireAuth, transactionRoutes);
+app.use("/api/dashboard", requireAuth, dashboardRoutes);
 
 export default app;

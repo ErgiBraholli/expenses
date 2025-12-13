@@ -2,9 +2,7 @@ import jwt from "jsonwebtoken";
 import { SUPABASE_JWT_SECRET } from "../config/env.js";
 
 export const requireAuth = (req, res, next) => {
-  if (req.method === "OPTIONS") {
-    return next();
-  }
+  if (req.method === "OPTIONS") return next();
 
   const authHeader = req.headers.authorization;
 
