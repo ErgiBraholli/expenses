@@ -1,0 +1,174 @@
+/* Global helpers */
+* {
+  box-sizing: border-box;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+:root {
+  --sidebarW: 260px;
+}
+
+/* Prevent long text/buttons from blowing layout */
+.btnPrimary,
+.btnGhost,
+.btnSmall,
+.select,
+.input {
+  max-width: 100%;
+}
+
+/* App layout*/
+.appShell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 18px;
+}
+
+/* Cards + sections */
+.cardsRow {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.cardStat {
+  flex: 1;
+  min-width: 220px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.card {
+  overflow: hidden;
+}
+
+/* Tables */
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.table th,
+.table td {
+  white-space: nowrap;
+}
+
+/* Forms */
+.authPage {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.authCard {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Sidebar responsiveness*/
+@media (max-width: 900px) {
+  :root {
+    --sidebarW: 220px;
+  }
+  .main {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Stack layout */
+  .appShell {
+    flex-direction: column;
+  }
+
+  /* Sidebar becomes a top bar */
+  .sidebar {
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .main {
+    padding: 12px;
+  }
+
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  .cardsRow {
+    gap: 10px;
+  }
+
+  .cardStat {
+    min-width: 100%;
+  }
+
+  /* Navbar */
+  .navbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .navbarTitle {
+    width: 100%;
+  }
+
+  .navbarRight {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .btnPrimary,
+  .btnGhost {
+    width: 100%;
+  }
+
+  .select,
+  .input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .main {
+    padding: 10px;
+  }
+
+  .card {
+    border-radius: 12px;
+  }
+
+  .sectionTitle {
+    font-size: 18px;
+  }
+}

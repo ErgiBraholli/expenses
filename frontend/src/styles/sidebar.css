@@ -1,0 +1,50 @@
+.sidebar {
+  width: 280px;
+  background: #0b1220;
+  color: #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+}
+
+.sidebarHeader {
+  padding: 10px 8px 18px;
+}
+
+.brand {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.sidebarNav {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.navItem {
+  padding: 12px 12px;
+  border-radius: 12px;
+  color: #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navItem.active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebarFooter {
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.logoutBtn {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  background: transparent;
+  color: #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+}
