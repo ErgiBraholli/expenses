@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { auth } from "./middleware/auth.js";
 
 import categoryRoutes from "./routes/categoryRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
@@ -9,23 +10,19 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:5173",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
 app.use(
   cors({
-    origin: (origin, cb) => {
-      // allow Postman/curl (no origin)
-      if (!origin) return cb(null, true);
-
-      // allow your frontend domains
-      if (allowedOrigins.includes(origin)) return cb(null, true);
-
-      // block others without throwing (avoids 500)
-      return cb(null, false);
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(null, false);
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -37,8 +34,8 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.use("/api/categories", categoryRoutes);
-app.use("/api/transactions", transactionRoutes);
-app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/categories", auth, categoryRoutes);
+app.use("/api/transactions", auth, transactionRoutes);
+app.use("/api/dashboard", auth, dashboardRoutes);
 
 export default app;
