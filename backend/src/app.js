@@ -7,7 +7,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 
 const app = express();
 
-const allowedOrigins = [
+const allowed = [
   "http://localhost:3000",
   "http://localhost:5173",
   process.env.FRONTEND_URL,
@@ -17,8 +17,8 @@ app.use(
   cors({
     origin: (origin, cb) => {
       if (!origin) return cb(null, true);
-      if (allowedOrigins.includes(origin)) return cb(null, true);
-      return cb(new Error("Not allowed by CORS"));
+      if (allowed.includes(origin)) return cb(null, true);
+      return cb(new Error("CORS blocked"));
     },
     credentials: true,
   })
