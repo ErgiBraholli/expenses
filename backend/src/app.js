@@ -8,22 +8,32 @@ import { requireAuth } from "./middleware/auth.js";
 
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:5173",
-  process.env.FRONTEND_URL,
-].filter(Boolean);
+const allowedOrigins = new Set(
+  [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    process.env.FRONTEND_URL,
+  ].filter(Boolean)
+);
+
+app.use((req, res, next) => {
+  if (req.headers.origin) {
+    console.log("ORIGIN:", req.headers.origin);
+    console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
+  }
+  next();
+});
 
 app.use(
   cors({
     origin: (origin, cb) => {
       if (!origin) return cb(null, true);
-      if (allowedOrigins.includes(origin)) return cb(null, true);
+      if (allowedOrigins.has(origin)) return cb(null, true);
       return cb(null, false);
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
 
