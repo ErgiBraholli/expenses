@@ -44,6 +44,14 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("API is running");
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true });
+});
+
 app.use("/api/categories", requireAuth, categoryRoutes);
 app.use("/api/transactions", requireAuth, transactionRoutes);
 app.use("/api/dashboard", requireAuth, dashboardRoutes);
