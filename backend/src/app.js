@@ -15,11 +15,14 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, cb) => {
+      // allow Postman/curl (no origin)
       if (!origin) return cb(null, true);
 
+      // allow your frontend domains
       if (allowedOrigins.includes(origin)) return cb(null, true);
 
-      return cb(new Error(`CORS blocked: ${origin}`));
+      // block others without throwing (avoids 500)
+      return cb(null, false);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -27,7 +30,11 @@ app.use(
   })
 );
 
-app.options("/*", cors());
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
+
 app.use(express.json());
 
 app.use("/api/categories", categoryRoutes);
