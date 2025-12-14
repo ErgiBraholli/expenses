@@ -2,30 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import api from "../api/axios";
-import { supabase } from "../api/supabase";
 import "../styles/app.css";
 import "../styles/table.css";
 
 const pad2 = (n) => String(n).padStart(2, "0");
 const toYYYYMM = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
-
-const monthOptionsFrom = (startYYYYMM) => {
-  const [sy, sm] = startYYYYMM.split("-").map(Number);
-  const start = new Date(sy, sm - 1, 1);
-
-  const now = new Date();
-  const end = new Date(now.getFullYear(), now.getMonth(), 1);
-
-  const out = [];
-  const cur = new Date(start);
-
-  while (cur <= end) {
-    out.push(toYYYYMM(cur));
-    cur.setMonth(cur.getMonth() + 1);
-  }
-
-  return out.reverse(); // latest first
-};
 
 const prettyMonth = (yyyyMM) => {
   const [y, m] = yyyyMM.split("-").map(Number);
@@ -34,8 +15,8 @@ const prettyMonth = (yyyyMM) => {
 };
 
 const Dashboard = () => {
-  const [userStartMonth, setUserStartMonth] = useState(null);
-  const [month, setMonth] = useState(null);
+  const [months, setMonths] = useState([]);
+  const [month, setMonth] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -45,39 +26,40 @@ const Dashboard = () => {
     topCategories: [],
   });
 
-  const months = useMemo(() => {
-    if (!userStartMonth) return [];
-    return monthOptionsFrom(userStartMonth);
-  }, [userStartMonth]);
-
   const fmt = (n) =>
     Number(n || 0).toLocaleString(undefined, {
       style: "currency",
       currency: "ALL",
     });
 
-  // Determine start month from account created_at
+  // 1) Load months that actually exist in transactions
   useEffect(() => {
     const run = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) {
-        console.error(error);
-        return;
+      try {
+        const res = await api.get("/transactions/months");
+        const list = res.data?.months || [];
+
+        const current = toYYYYMM(new Date());
+        const finalMonths = list.length ? list : [current];
+
+        setMonths(finalMonths);
+
+        // Default selected month:
+        // - if current month exists in list, select it
+        // - else select the newest month (first item)
+        setMonth(finalMonths.includes(current) ? current : finalMonths[0]);
+      } catch (e) {
+        console.error("Failed to load months", e);
+        const current = toYYYYMM(new Date());
+        setMonths([current]);
+        setMonth(current);
       }
-
-      const createdAt = data.user?.created_at;
-      const start = createdAt
-        ? toYYYYMM(new Date(createdAt))
-        : toYYYYMM(new Date());
-
-      setUserStartMonth(start);
-      setMonth(toYYYYMM(new Date())); // default to current month
     };
 
-    run().catch(console.error);
+    run();
   }, []);
 
-  // Fetch dashboard stats when month changes
+  // 2) Fetch dashboard stats when selected month changes
   useEffect(() => {
     if (!month) return;
 
@@ -87,7 +69,7 @@ const Dashboard = () => {
         const res = await api.get("/dashboard", { params: { month } });
         setStats(res.data);
       } catch (e) {
-        console.error(e);
+        console.error("Dashboard fetch error", e);
       } finally {
         setLoading(false);
       }
@@ -95,6 +77,8 @@ const Dashboard = () => {
 
     run();
   }, [month]);
+
+  const monthLabel = useMemo(() => (month ? prettyMonth(month) : ""), [month]);
 
   return (
     <div className="appShell">
@@ -108,6 +92,9 @@ const Dashboard = () => {
               className="select"
               value={month || ""}
               onChange={(e) => setMonth(e.target.value)}
+              disabled={!months.length}
+              aria-label="Select month"
+              title={monthLabel}
             >
               {months.map((m) => (
                 <option key={m} value={m}>

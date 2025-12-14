@@ -68,3 +68,34 @@ export const deleteTransaction = async (req, res) => {
   if (error) return res.status(400).json(error);
   res.json({ success: true });
 };
+
+export const getTransactionMonths = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Get all distinct months that have ANY transactions for this user
+    const { data, error } = await supabase
+      .from("transactions")
+      .select("date")
+      .eq("user_id", userId)
+      .order("date", { ascending: false });
+
+    if (error) throw error;
+
+    const months = Array.from(
+      new Set(
+        (data || []).map((r) => {
+          const d = new Date(r.date);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, "0");
+          return `${y}-${m}`;
+        })
+      )
+    );
+
+    return res.json({ months });
+  } catch (e) {
+    console.error("getTransactionMonths error:", e);
+    return res.status(500).json({ error: "Failed to fetch months" });
+  }
+};
